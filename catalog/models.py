@@ -7,11 +7,11 @@ from datetime import date
 class CustomUser(AbstractUser):
     full_name = models.CharField(max_length=100,validators=
                 [RegexValidator(
-                regex='^[a-zA-Z\s\-]+$',
+                regex= '^[a-zA-Z \\-]+$',
                 message='full ')],verbose_name='ФИО')
     USER_TYPE_CHOICES = (
-        ('client'),
-        ('admin'),
+        ('client', 'Client'),
+        ('admin', 'Admin'),
     )
     user_type = models.CharField(max_length=10,choices=USER_TYPE_CHOICES,default='client',verbose_name='user_type')
     class Meta:
@@ -51,9 +51,9 @@ class DesignRequest(models.Model):
     #(аналогично status у BookInstance)
 
     STATUS_CHOICES = (
-        ('new',),
-        ('in_progress',),
-        ('completed',),
+        ('new', 'New'),
+        ('in_progress', 'In_progress'),
+        ('completed', 'Completed'),
     )
     status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='new',help_text='Application status')
     plan_image = models.ImageField(upload_to='plans/%Y/%m/%d/',verbose_name='Room plan')
@@ -61,7 +61,6 @@ class DesignRequest(models.Model):
     admin_comment = models.TextField(verbose_name='Admin comment',blank=True)
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Creation date')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Update date')
-
 
     id = models.UUIDField(
         primary_key=True,
@@ -72,8 +71,8 @@ class DesignRequest(models.Model):
     class Meta:
         ordering = ['-created_at']
         permissions = (
-            ("can_change_status",),
-            ("can_view_all",),
+            ("can_change_status", "Can change status of the request"),
+            ("can_view_all", "Can view all requests"),
         )
 
     def __str__(self):
