@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block title %}{{ request.title }} | Design.pro{% endblock %}
+
+{% block content %}
+<h2>{{ request.title }}</h2>
+<p><strong>Описание:</strong> {{ request.description }}</p>
+<p><strong>Категория:</strong> {{ request.category.name }}</p>
+<p><strong>Статус:</strong> {{ request.get_status_display }}</p>
+<p><strong>Дата создания:</strong> {{ request.created_at|date:"d.m.Y H:i" }}</p>
+
+{% if request.plan_image %}
+    <h3>План помещения</h3>
+    <img src="{{ request.plan_image.url }}" alt="План" width="400">
+{% endif %}
+
+{% if request.design_image %}
+    <h3>Готовый дизайн</h3>
+    <img src="{{ request.design_image.url }}" alt="Дизайн" width="400">
+{% endif %}
+
+{% if request.admin_comment %}
+    <h3>Комментарий администратора</h3>
+    <p>{{ request.admin_comment }}</p>
+{% endif %}
+
+<a href="{% url 'my_requests' %}">Назад к моим заявкам</a>
+{% endblock %}

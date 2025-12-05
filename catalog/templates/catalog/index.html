@@ -1,0 +1,36 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Design.pro — Дизайн интерьеров{% endblock %}
+
+{% block content %}
+<h1 >Добро пожаловать в Design.pro!</h1>
+
+<h2>Последние выполненные проекты</h2>
+{% if completed_requests %}
+    <div class="projects">
+        {% for req in completed_requests %}
+            <div class="project">
+                <h3>{{ req.title }}</h3>
+                <p><strong>Категория:</strong> {{ req.category.name }}</p>
+                <p><strong>Дата:</strong> {{ req.created_at|date:"d.m.Y" }}</p>
+                {% if req.design_image %}
+                    <img src="{{ req.design_image.url }}" alt="Дизайн" width="300" style="margin: 10px 0;">
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Нет выполненных проектов.</p>
+{% endif %}
+
+<div class="stats" style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 5px;">
+    <h3>Текущие работы</h3>
+    <p>Заявок в работе: <strong>{{ in_progress_count }}</strong></p>
+</div>
+
+{% if not user.is_authenticated %}
+    <p style="margin-top: 20px;">
+        <a href="{% url 'register' %}">Зарегистрируйтесь</a>, чтобы создать заявку на дизайн!
+    </p>
+{% endif %}
+{% endblock %}

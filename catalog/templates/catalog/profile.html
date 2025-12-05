@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Личный кабинет | Design.pro{% endblock %}
+
+{% block content %}
+<h2>Привет, {{ user.full_name|default:user.username }}!</h2>
+<p>Вы авторизованы как пользователь.</p>
+<ul>
+    <li><a href="{% url 'my_requests' %}">Мои заявки</a></li>
+    <li><a href="{% url 'create_request' %}">Создать новую заявку</a></li>
+    <li><a href="{% url 'logout' %}">Выход</a></li>
+</ul>
+{% endblock %}
