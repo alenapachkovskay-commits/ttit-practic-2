@@ -1,108 +1,137 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, FileExtensionValidator
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 import uuid
-from datetime import date
+
+
+
+def validate_image_file(value):
+    """Валидатор изображения: формат и размер ≤ 2 МБ"""
+    allowed_extensions = ['jpg', 'jpeg', 'png', 'bmp']
+    ext = value.name.split('.')[-1].lower()
+    if ext not in allowed_extensions:
+        raise ValidationError(
+            _('Разрешены только файлы форматов: JPG, JPEG, PNG, BMP.')
+        )
+    if value.size > 2 * 1024 * 1024:  # 2 МБ
+        raise ValidationError(_('Размер файла не должен превышать 2 МБ.'))
+
 
 class CustomUser(AbstractUser):
-    full_name = models.CharField(max_length=100,validators=
-                [RegexValidator(
-                regex= '^[a-zA-Z \\-]+$',
-                message='full ')],verbose_name='ФИО')
-    USER_TYPE_CHOICES = (
-        ('client', 'Client'),
-        ('admin', 'Admin'),
+    # ФИО: только кириллица, пробел, дефис
+    full_name = models.CharField(
+        max_length=150,
+        verbose_name=_('ФИО'),
+        validators=[
+            RegexValidator(
+                regex=r'^[а-яА-ЯёЁ \-]+$',
+                message=_('ФИО может содержать только кириллические буквы, пробел и дефис.')
+            )
+        ]
     )
-    user_type = models.CharField(max_length=10,choices=USER_TYPE_CHOICES,default='client',verbose_name='user_type')
+
     class Meta:
-        ordering = ['last_name', 'first_name']
+        ordering = ['full_name']
+        verbose_name = _('Пользователь')
+        verbose_name_plural = _('Пользователи')
 
     def __str__(self):
-        """String for representing the Model object"""
-        return f'{self.last_name}, {self.first_name}'
+        return self.full_name
 
     def get_absolute_url(self):
-        """Returns the URL to access a particular user instance."""
         from django.urls import reverse
         return reverse('user-detail', args=[str(self.id)])
 
 
 class Category(models.Model):
+    name = models.CharField(
+        max_length=200,
+        verbose_name=_('Название категории'),
+        help_text=_("Например: 3D-дизайн, Эскиз и т.д.")
+    )
 
-    name = models.CharField(max_length=200,help_text="Enter the application category (e.g., 3D design, Sketch, etc.)")
-    is_active = models.BooleanField(default=True, verbose_name='active')
+
+    class Meta:
+        verbose_name = _('Категория')
+        verbose_name_plural = _('Категории')
 
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name = 'category'
-        verbose_name_plural = 'category'
-
 
 class DesignRequest(models.Model):
-    """
-    Model representing a design request.
-    """
-    title = models.CharField(max_length=200, verbose_name='name')
-    description = models.TextField(max_length=1000,help_text='Enter a description of the room and design preferences')
-    client = models.ForeignKey(CustomUser,on_delete=models.CASCADE,verbose_name='client',related_name='design_requests')
-    category = models.ForeignKey(Category,on_delete=models.SET_NULL,null=True,help_text='Select a category for this application')
-    #(аналогично status у BookInstance)
-
     STATUS_CHOICES = (
-        ('new', 'New'),
-        ('in_progress', 'In_progress'),
-        ('completed', 'Completed'),
+        ('new', _('Новая')),
+        ('in_progress', _('Принято в работу')),
+        ('completed', _('Выполнено')),
     )
-    status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='new',help_text='Application status')
-    plan_image = models.ImageField(upload_to='plans/%Y/%m/%d/',verbose_name='Room plan')
-    design_image = models.ImageField(upload_to='designs/%Y/%m/%d/',verbose_name='Design-project',blank=True,null=True)
-    admin_comment = models.TextField(verbose_name='Admin comment',blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Creation date')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Update date')
+
+    title = models.CharField(max_length=200, verbose_name=_('Название'))
+    description = models.TextField(
+        max_length=1000,
+        verbose_name=_('Описание'),
+        help_text=_('Опишите помещение и пожелания по дизайну')
+    )
+    client = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        verbose_name=_('Клиент'),
+        related_name='design_requests'
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        verbose_name=_('Категория')
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='new',
+        verbose_name=_('Статус')
+    )
+    plan_image = models.ImageField(
+        upload_to='plans/%Y/%m/%d/',
+        verbose_name=_('План помещения'),
+        validators=[validate_image_file]
+    )
+    design_image = models.ImageField(
+        upload_to='designs/%Y/%m/%d/',
+        verbose_name=_('Готовый дизайн'),
+        blank=True,
+        null=True,
+        validators=[validate_image_file]
+    )
+    admin_comment = models.TextField(
+        verbose_name=_('Комментарий администратора'),
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата создания'))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_('Дата обновления'))
 
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
-        help_text='Unique ID for this application'
+        editable=False,
+        verbose_name=_('Уникальный ID заявки')
     )
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = _('Заявка')
+        verbose_name_plural = _('Заявки')
         permissions = (
-            ("can_change_status", "Can change status of the request"),
-            ("can_view_all", "Can view all requests"),
+            ("can_change_status", _("Может изменять статус заявки")),
+            ("can_view_all", _("Может просматривать все заявки")),
         )
 
     def __str__(self):
-        return self.title
-
-    def display_category(self):
-        """
-        Creates a string for the Category. This is required to display category in Admin.
-        """
-        return self.category.name if self.category else ''
-
-    display_category.short_description = 'category'
-
-    def display_client(self):
-        """Аналогично display_author()"""
-        return str(self.client)
-
-    display_client.short_description = 'client'
-
-    def get_absolute_url(self):
-        """
-        Returns the url to access a particular request instance.
-        Как у Book и Author.
-        """
-        from django.urls import reverse
-        return reverse('request-detail', args=[str(self.id)])
+        return f"{self.title} ({self.get_status_display()})"
 
     @property
     def can_be_deleted(self):
-        """(аналогично is_overdue у BookInstance)"""
+        """Можно удалить, только если статус — 'Новая'"""
         return self.status == 'new'
 
     def take_to_work(self, comment):
@@ -111,14 +140,20 @@ class DesignRequest(models.Model):
             return False
         self.status = 'in_progress'
         self.admin_comment = comment
-        self.save()
+        self.save(update_fields=['status', 'admin_comment', 'updated_at'])
         return True
 
     def complete(self, design_image):
-        """Завершить заявку"""
-        if self.status != 'new':
+        """Завершить заявку: можно из 'new' или 'in_progress'"""
+        if self.status not in ('new', 'in_progress'):
             return False
+        if not design_image:
+            return False  # изображение обязательно при завершении
         self.status = 'completed'
         self.design_image = design_image
-        self.save()
+        self.save(update_fields=['status', 'design_image', 'updated_at'])
         return True
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('request-detail', args=[str(self.id)])
