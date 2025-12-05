@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Мои заявки{% endblock %}
+
+{% block content %}
+<h1>Мои заявки</h1>
+
+{% if requests %}
+    <ul>
+    {% for req in requests %}
+        <li>
+
+            <strong>{{ req.title }}</strong> ({{ req.get_status_display }})
+            — {{ req.created_at|date:"d.m.Y H:i" }}
+            <a href="{% url 'request-detail' req.id %}">Просмотр</a>
+            {% if req.can_be_deleted %}
+                <a href="{% url 'delete_request' req.id %}">Удалить</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>У вас пока нет заявок.</p>
+{% endif %}
+
+<a href="{% url 'create_request' %}">Создать новую заявку</a>
+{% endblock %}
