@@ -12,9 +12,10 @@
         <h1><a href="{% url 'home' %}">Design.pro</a></h1>
         <nav>
             {% if user.is_authenticated %}
-                <span>Привет, {{ user.full_name|default:user.username }}!</span>
+                <span>Привет, {{ user.full_name|default:user.username }}! <a href="{% url 'profile' %}"> Профиль</a></span>
                 {% if user.is_staff %}
-                    <a href="{% url 'admin:index' %}">Админка</a>
+                <a href="{% url 'admin-all-requests' %}">Админка</a>
+                    <a href="{% url 'admin:index' %}">Админ</a>
                 {% endif %}
                 <a href="{% url 'logout' %}">Выход</a>
             {% else %}

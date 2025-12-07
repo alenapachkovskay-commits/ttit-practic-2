@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Удалить категорию | Design.pro{% endblock %}
+
+{% block content %}
+<h2>Подтверждение удаления</h2>
+
+<p>Вы действительно хотите удалить категорию <strong>"{{ category.name }}"</strong>?</p>
+<p><strong>Все заявки этой категории будут удалены безвозвратно!</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" >Удалить</button>
+    <a href="{% url 'admin-category-list' %}" style="margin-left: 10px;">Отмена</a>
+</form>
+{% endblock %}
