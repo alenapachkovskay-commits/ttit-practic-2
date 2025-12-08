@@ -4,9 +4,25 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import DesignRequest
 from .forms import CustomUserCreationForm, DesignRequestForm
+from django.contrib.auth.decorators import user_passes_test
+from .models import Category
+from .forms import CategoryForm
 
 
-# Главная страница
+def is_admin(user):
+    return user.is_staff
+
+@user_passes_test(is_admin, login_url='login')
+def admin_all_requests(request):
+    status_filter = request.GET.get('status', '')
+    requests = DesignRequest.objects.all()
+    if status_filter:
+        requests = requests.filter(status=status_filter)
+    requests = requests.order_by('-created_at')
+    return render(request, 'catalog/admin_all_requests.html', {
+        'requests': requests,
+        'status_filter': status_filter
+    })
 def home(request):
     # 4 последние заявки со статусом "Выполнено"
     completed_requests = DesignRequest.objects.filter(status='completed').order_by('-created_at')[:4]
@@ -71,6 +87,9 @@ def my_requests(request):
 # Создание заявки
 @login_required
 def create_request(request):
+    if request.user.is_staff:
+        messages.error(request, 'Администратор не может создавать заявки.')
+        return redirect('profile')
     if request.method == 'POST':
         form = DesignRequestForm(request.POST, request.FILES)
         if form.is_valid():
@@ -103,3 +122,66 @@ def delete_request(request, pk):
 def request_detail(request, pk):
     req = get_object_or_404(DesignRequest, pk=pk, client=request.user)
     return render(request, 'catalog/request_detail.html', {'request': req})
+
+@user_passes_test(is_admin, login_url='login')
+def admin_complete(request, pk):
+    req = get_object_or_404(DesignRequest, pk=pk)
+    if req.status != 'new':
+        messages.error(request, 'Статус можно изменить только у новых заявок.')
+        return redirect('admin-all-requests')
+
+    if request.method == 'POST':
+        design_image = request.FILES.get('design_image')
+        if not design_image:
+            messages.error(request, 'Изображение дизайна обязательно.')
+            return render(request, 'catalog/admin_complete.html', {'request': req})
+        req.complete(design_image)
+        messages.success(request, 'Заявка выполнена.')
+        return redirect('admin-all-requests')
+
+    return render(request, 'catalog/admin_complete.html', {'request': req})
+
+@user_passes_test(is_admin, login_url='login')
+def admin_category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'catalog/admin_category_list.html', {'categories': categories})
+
+@user_passes_test(is_admin, login_url='login')
+def admin_category_create(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Категория добавлена.')
+            return redirect('admin-category-list')
+    else:
+        form = CategoryForm()
+    return render(request, 'catalog/admin_category_create.html', {'form': form})
+
+@user_passes_test(is_admin, login_url='login')
+def admin_category_delete(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == 'POST':
+        category.delete()  # CASCADE удалит все заявки!
+        messages.success(request, 'Категория и все связанные заявки удалены.')
+        return redirect('admin-category-list')
+    return render(request, 'catalog/admin_category_delete_confirm.html', {'category': category})
+
+@user_passes_test(is_admin, login_url='login')
+def admin_take_to_work(request, pk):
+    req = get_object_or_404(DesignRequest, pk=pk)
+    if req.status != 'new':
+        messages.error(request, 'Статус можно изменить только у новых заявок.')
+        return redirect('admin-all-requests')
+
+    if request.method == 'POST':
+        comment = request.POST.get('comment', '').strip()
+        if not comment:
+            messages.error(request, 'Комментарий обязателен.')
+            return render(request, 'catalog/admin_take_to_work.html', {'request': req})
+        req.take_to_work(comment)
+        messages.success(request, 'Заявка принята в работу.')
+        return redirect('admin-all-requests')
+
+    return render(request, 'catalog/admin_take_to_work.html', {'request': req})
+

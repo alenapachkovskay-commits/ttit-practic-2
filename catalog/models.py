@@ -6,6 +6,17 @@ from django.utils.translation import gettext_lazy as _
 import uuid
 
 
+def complete(self, design_image):
+    """Завершить заявку: можно из 'new' или 'in_progress'"""
+    if self.status not in ('new', 'in_progress'):
+        return False
+    if not design_image:
+        return False
+    self.status = 'completed'
+    self.design_image = design_image
+    self.save(update_fields=['status', 'design_image', 'updated_at'])
+    return True
+
 
 def validate_image_file(value):
     """Валидатор изображения: формат и размер ≤ 2 МБ"""
