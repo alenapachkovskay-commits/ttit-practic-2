@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+{% block title %}Принять заявку в работу{% endblock %}
+
+{% block content %}
+<h2>Принять заявку в работу</h2>
+
+<p><strong>Заявка:</strong> {{ request.title }}</p>
+<p><strong>Клиент:</strong> {{ request.client.full_name }}</p>
+<p><strong>Описание:</strong> {{ request.description }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="comment">Комментарий администратора (обязателен):</label><br>
+    <textarea name="comment" id="comment" rows="4" required></textarea><br><br>
+    
+    <button type="submit">Принять в работу</button>
+    <a href="{% url 'admin-all-requests' %}">Отмена</a>
+</form>
+{% endblock %}
