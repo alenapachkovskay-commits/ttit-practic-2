@@ -1,8 +1,10 @@
 {% extends "base_generic.html" %}
+{% load static %}
 
 {% block title %}{{ request.title }} | Design.pro{% endblock %}
 
 {% block content %}
+
 <h2>{{ request.title }}</h2>
 <p><strong>Описание:</strong> {{ request.description }}</p>
 <p><strong>Категория:</strong> {{ request.category.name }}</p>
@@ -24,5 +26,9 @@
     <p>{{ request.admin_comment }}</p>
 {% endif %}
 
-<a href="{% url 'my_requests' %}">Назад к моим заявкам</a>
+{% if user.is_staff %}
+    <a href="{% url 'admin-all-requests' %}">Назад ко всем заявкам</a>
+{% else %}
+    <a href="{% url 'my_requests' %}">Назад к моим заявкам</a>
+{% endif %}
 {% endblock %}

@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Design.pro — Дизайн интерьеров{% endblock %}</title>
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header>
-        <h1><a href="{% url 'home' %}">Design.pro</a></h1>
-        <nav>
+    <header class="site-header">
+        <h1 class="site-title">
+            <a href="{% url 'home' %}">Design.pro</a>
+        </h1>
+        <nav class="main-nav">
             {% if user.is_authenticated %}
-                <span>Привет, {{ user.full_name|default:user.username }}! <a href="{% url 'profile' %}"> Профиль</a></span>
+                <span class="greeting">Привет, {{ user.full_name|default:user.username }}!
+                    <a href="{% url 'profile' %}">Профиль</a>
+                </span>
                 {% if user.is_staff %}
-                <a href="{% url 'admin-all-requests' %}">Админка</a>
+                    <a href="{% url 'admin-all-requests' %}">Админка</a>
                     <a href="{% url 'admin:index' %}">Админ</a>
                 {% endif %}
-                <a href="{% url 'logout' %}">Выход</a>
+                <a href="{% url 'logout' %}" class="btn">Выход</a>
             {% else %}
-                <a href="{% url 'login' %}">Вход</a>
-                <a href="{% url 'register' %}">Регистрация</a>
+                <a href="{% url 'login' %}" class="btn">Вход</a>
+                <a href="{% url 'register' %}" class="btn">Регистрация</a>
             {% endif %}
         </nav>
     </header>
 
-    <main class="body">
+    <main class="main-content">
         {% if messages %}
             <ul class="messages">
                 {% for message in messages %}
-                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    <li class="{{ message.tags }}">{{ message }}</li>
                 {% endfor %}
             </ul>
         {% endif %}
@@ -38,7 +42,7 @@
         {% endblock %}
     </main>
 
-    <footer>
+    <footer class="site-footer">
         <p>&copy; 2025 Design.pro — Дизайн интерьеров</p>
     </footer>
 </body>

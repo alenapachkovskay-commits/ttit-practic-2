@@ -17,7 +17,7 @@
         {% for req in requests %}
         <tr>
             <td>{{ req.created_at|date:"d.m.Y H:i" }}</td>
-            <td>{{ req.title }}</td>
+            <td><a href="{% url 'request-detail' req.pk %}">{{ req.title }}</a></td>
             <td>{{ req.client.full_name }}</td>
             <td>{{ req.get_status_display }}</td>
             <td>
@@ -25,7 +25,6 @@
                     <a href="{% url 'admin-take-to-work' req.pk %}">Принять</a>
                     <a href="{% url 'admin-complete' req.pk %}">Выполнить</a>
                 {% else %}
-
 
                 {% endif %}
             </td>

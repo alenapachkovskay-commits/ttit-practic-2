@@ -1,0 +1,236 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d0d0d;
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Хедер */
+.site-header {
+    background-color: #1a1a1a;
+    padding: 16px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #c9a75e;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+}
+
+.site-title a {
+    color: #c9a75e;
+    text-decoration: none;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.site-title a:hover {
+    color: #e0e0e0;
+}
+
+.main-nav {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.main-nav a,
+.greeting {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+.main-nav a:hover {
+    color: #0d0d0d;
+}
+
+.btn {
+    background-color: #8b6b3d;
+    color: #fff;
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.btn:hover {
+    background-color: #c9a75e;
+    color: #000;
+}
+
+/* Основа */
+.main-content {
+    flex: 1;
+    padding: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.messages {
+    margin-bottom: 24px;
+}
+
+.messages li {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    background-color: #1a1a1a;
+    border-left: 4px solid #c9a75e;
+}
+
+/* Футер */
+.site-footer {
+    background-color: #1a1a1a;
+    padding: 16px 32px;
+    text-align: center;
+    border-top: 2px solid #c9a75e;
+    margin-top: auto;
+}
+
+.site-footer p {
+    color: #a0a0a0;
+    font-size: 14px;
+}
+/* === Главная страница === */
+
+.main-content h1 {
+    font-size: 32px;
+    margin-bottom: 24px;
+    color: #c9a75e;
+}
+
+.main-content h2 {
+    font-size: 24px;
+    margin: 24px 0 16px 0;
+    color: #e0e0e0;
+}
+
+/* Проекты */
+.projects {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.project {
+    background-color: #1a1a1a;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 6px;
+    min-width: 320px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.project h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: #c9a75e;
+}
+
+.project p {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.project-image {
+    width: 300px;
+    height: auto;
+    margin: 10px 0;
+    display: block;
+    border-radius: 4px;
+    border: 1px solid #333;
+}
+
+/* Статистика */
+.stats {
+    margin-top: 30px;
+    padding: 15px;
+    background-color: #1a1a1a;
+    border-radius: 5px;
+    border-left: 4px solid #c9a75e;
+}
+
+.stats h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #c9a75e;
+}
+
+.stats p {
+    font-size: 16px;
+}
+/* === Формы (вход, регистрация) === */
+
+.main-content h2.form-title {
+    font-size: 28px;
+    margin-bottom: 24px;
+    color: #c9a75e;
+    text-align: center;
+}
+
+.login-form,
+.register-form {
+    max-width: 400px;
+    margin: 0 auto 24px auto;
+    background-color: #1a1a1a;
+    padding: 24px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: #e0e0e0;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    color: #e0e0e0;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #c9a75e;
+    box-shadow: 0 0 0 2px rgba(201, 167, 94, 0.3);
+}
+
+.form-link {
+    text-align: center;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.form-link a {
+    color: #c9a75e;
+    text-decoration: none;
+}
+
+.form-link a:hover {
+    text-decoration: underline;
+}
