@@ -2,15 +2,16 @@
 {% block title %}Категории{% endblock %}
 
 {% block content %}
-<h2>Категории</h2>
-<ul>
+<h2 class="page-title">Категории</h2>
+
+<ul class="categories-list">
     {% for cat in categories %}
-    <li>
-        {{ cat.name }}
-        <a href="{% url 'admin-category-delete' cat.pk %}">Удалить</a>
+    <li class="category-item">
+        <span>{{ cat.name }}</span>
+        <a href="{% url 'admin-category-delete' cat.pk %}" class="delete-link">Удалить</a>
     </li>
     {% endfor %}
 </ul>
-<a href="{% url 'admin-category-create' %}">Добавить категорию</a>
 
+<a href="{% url 'admin-category-create' %}" class="add-link">Добавить категорию</a>
 {% endblock %}

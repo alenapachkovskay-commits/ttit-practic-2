@@ -9,6 +9,7 @@
 {% if completed_requests %}
     <div class="projects">
         {% for req in completed_requests %}
+          <a href="{% url 'request-detail' req.pk %}" class="project-link">
             <div class="project">
                 <h3>{{ req.title }}</h3>
                 <p><strong>Категория:</strong> {{ req.category.name }}</p>
@@ -17,6 +18,7 @@
                     <img src="{{ req.design_image.url }}" alt="Дизайн" class="project-image">
                 {% endif %}
             </div>
+          </a>
         {% endfor %}
     </div>
 {% else %}

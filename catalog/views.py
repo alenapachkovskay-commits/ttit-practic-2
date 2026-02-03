@@ -185,3 +185,15 @@ def admin_take_to_work(request, pk):
 
     return render(request, 'catalog/admin_take_to_work.html', {'request': req})
 
+@login_required
+def request_detail(request, pk):
+    # Загружаем заявку
+    req = get_object_or_404(DesignRequest, pk=pk)
+
+    # Обычный пользователь может смотреть ТОЛЬКО свои заявки
+    if not request.user.is_staff and req.client != request.user:
+        messages.error(request, 'У вас нет доступа к этой заявке.')
+        return redirect('my_requests')
+
+    return render(request, 'catalog/request_detail.html', {'request': req})
+
